@@ -19,6 +19,11 @@ sudo apt-get update
 # Install the latest stable version of Oracle Java 7 (and accept the license agreement that pops up):
 sudo apt-get install oracle-java8-installer
 
+# append this in last line
+sudo nano JAVA_HOME='/usr/lib/jvm/java-8-oracle/jre/bin/java'
+source /etc/environment
+echo $JAVA_HOME
+
 # allow Java to access privileged ports
 setcap cap_net_bind_service=+epi /usr/lib/jvm/java-7-oracle/jre/bin/java
 # --------------------------- Install Elasticsearch ---------------------------
@@ -26,16 +31,18 @@ setcap cap_net_bind_service=+epi /usr/lib/jvm/java-7-oracle/jre/bin/java
 read -p "Press [Enter] key to install Elasticseach..."
 
 # Run the following command to import the Elasticsearch public GPG key into apt:
-wget -qO - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+sudo apt-get install apt-transport-https
 
 # Create the Elasticsearch source list:
-echo 'deb http://packages.elasticsearch.org/elasticsearch/1.4/debian stable main' | sudo tee /etc/apt/sources.list.d/elasticsearch.list
+echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
 
 # Update your apt package database:
 sudo apt-get update
 
 # Install Elasticsearch with this command:
-sudo apt-get -y install elasticsearch
+export ES_SKIP_SET_KERNEL_PARAMETERS=true && apt-get install elasticsearch
 
 echo " "
 echo "------------ Configure Elasticsearch ------------"
@@ -49,24 +56,29 @@ echo "         network.host: localhost"
 echo " "
 read -p "Press [Enter] key to configure Elasticseach..."
 
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable elasticsearch.service
+
+echo "Start "
+echo "sudo systemctl start elasticsearch.service "
+echo "Stop "
+echo "sudo systemctl stop elasticsearch.service"
+
 # Elasticsearch is now installed. Let's edit the configuration:
 sudo nano /etc/elasticsearch/elasticsearch.yml
 
 # Now start Elasticsearch:
-sudo service elasticsearch restart
-
-# Then run the following command to start Elasticsearch on boot up:
-sudo update-rc.d elasticsearch defaults 95 10
+sudo systemctl restart elasticsearch.service
 
 read -p "Press [Enter] key to install Kibana..."
 
 # -------------------------- Install Kibana --------------------------
 
 # Download Kibana to your home directory with the following command:
-cd ~; wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.2.tar.gz
+sudo apt-get install kibana
 
-# Extract Kibana archive with tar:
-tar xvf kibana-3.1.2.tar.gz
+#sudo /bin/systemctl daemon-reload
+#sudo /bin/systemctl enable kibana.service
 
 echo " "
 echo "------ Configure Kibana ------"

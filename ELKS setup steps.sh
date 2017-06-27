@@ -1,16 +1,23 @@
 #!/bin/bash
-# --------------------------- Install JAVA 7 ---------------------------
 
-read -p "Press [Enter] key to install Java 7..."
+
+sudo apt-get install software-properties-common python-software-properties
+
+sudo apt-get update
+
+
+# --------------------------- Install JAVA 8 ---------------------------
+
+read -p "Press [Enter] key to install Java 8..."
 
 # Add the Oracle Java PPA to apt
-sudo add-apt-repository -y ppa:webupd8team/java
+sudo add-apt-repository ppa:webupd8team/java
 
 # Update your apt package database:
 sudo apt-get update
 
 # Install the latest stable version of Oracle Java 7 (and accept the license agreement that pops up):
-sudo apt-get -y install oracle-java7-installer
+sudo apt-get install oracle-java8-installer
 
 # allow Java to access privileged ports
 setcap cap_net_bind_service=+epi /usr/lib/jvm/java-7-oracle/jre/bin/java

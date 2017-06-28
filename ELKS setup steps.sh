@@ -80,6 +80,8 @@ sudo apt-get install kibana
 #sudo /bin/systemctl daemon-reload
 #sudo /bin/systemctl enable kibana.service
 
+sudo /etc/kibana/kibana.yml
+
 echo " "
 echo "------ Configure Kibana ------"
 echo "In the Kibana configuration file, find the line that specifies the elasticsearch,"
@@ -116,8 +118,8 @@ echo "     root /var/www/kibana3;"
 echo " "
 read -p "Press [Enter] key to configure nginx.conf..."
 
-# Open the sample configuration file for editing:
-sudo nano nginx.conf
+
+# Check this https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-logstash-and-kibana-elk-stack-on-ubuntu-16-04
 
 # Now copy it over your Nginx default server block with the following command:
 sudo cp nginx.conf /etc/nginx/sites-available/default
@@ -127,13 +129,19 @@ sudo apt-get install apache2-utils
 
 # Then generate a login that will be used in Kibana to save and share dashboards (substitute your own username):
 read -p "Enter username to generate a login that will be used in Kibana to save and share dashboards:" username
-sudo htpasswd -c /etc/nginx/conf.d/kibana.myhost.org.htpasswd $username
+# sudo htpasswd -c /etc/nginx/conf.d/kibana.myhost.org.htpasswd $username
+echo "kibanaadmin:`openssl passwd -apr1`" | sudo tee -a /etc/nginx/htpasswd.users
 
 # Then enter a password and verify it. The htpasswd file just created is referenced in the Nginx
 # configuration that you recently configured.
 
+# Open the sample configuration file for editing:
+sudo nano nginx.conf
+
+sudo nginx -t
+
 # Now restart Nginx to put our changes into effect:
-sudo service nginx restart
+sudo systemctl restart nginx
 
 # -------------------------- Install Logstash --------------------------
 
